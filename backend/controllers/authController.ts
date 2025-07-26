@@ -1,36 +1,62 @@
-import { Request, Response } from 'express';
-import Otp from '../models/Otp';
-import jwt from 'jsonwebtoken';
-import { sendOtpMail } from '../utils/sendOtp';
+import { Request, Response } from "express";
+import Otp from "../models/Otp";
+import User from "../models/User";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { sendOtpMail } from "../utils/sendOtp";
 
+// Send OTP
 export const sendOtp = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: 'Email is required' });
+const { email } = req.body;
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+if (!email) return res.status(400).json({ message: "Email is required" });
 
-  await Otp.deleteMany({ email }); // Clear previous
-  await new Otp({ email, code, expiresAt }).save();
+try {
+const otp = crypto.randomInt(100000, 999999).toString();
+await Otp.findOneAndUpdate(
+  { email },
+  { otp, createdAt: new Date() },
+  { upsert: true, new: true }
+);
 
-  await sendOtpMail(email, code);
+await sendOtpMail(email, otp);
 
-  res.json({ message: 'OTP sent successfully' });
+res.status(200).json({ message: "OTP sent" });
+} catch (error) {
+console.error("Error sending OTP:", error);
+res.status(500).json({ message: "Error sending OTP" });
+}
 };
 
+// Verify OTP
 export const verifyOtp = async (req: Request, res: Response) => {
-  const { email, otp } = req.body;
-  if (!email || !otp) return res.status(400).json({ message: 'All fields required' });
+const { name, dob, email, otp } = req.body;
 
-  const record = await Otp.findOne({ email, code: otp });
-  if (!record || record.expiresAt < new Date()) {
-    return res.status(400).json({ message: 'Invalid or expired OTP' });
-  }
+try {
+const existingOtp = await Otp.findOne({ email });
+console.log("User entered OTP:", otp);
+console.log("OTP from DB:", existingOtp?.otp);
 
-  // Generate JWT token
-  const token = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+if (!existingOtp || existingOtp.otp !== String(otp)) {
+  return res.status(400).json({ message: "Invalid or expired OTP" });
+}
 
-  await Otp.deleteMany({ email }); // Clear used OTP
+let user = await User.findOne({ email });
 
-  res.json({ message: 'Login successful', token });
+if (!user) {
+  user = new User({ name, dob, email });
+  await user.save();
+}
+
+const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+  expiresIn: "7d",
+});
+
+await Otp.deleteOne({ email });
+
+res.json({ token, user });
+} catch (err) {
+console.error("OTP Verification Error:", err);
+res.status(500).json({ message: "Server error during OTP verification" });
+}
 };
