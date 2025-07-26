@@ -1,12 +1,16 @@
-import { useState } from 'react'
+// src/App.tsx
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Signup from './pages/signup';
+import Login from './pages/login';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <div>
-    </div>
-  )
-}
+    <Routes>
+      <Route path="/" element={<Navigate to="/signup" replace />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
+  );
+};
 
-export default App
+export default App;
