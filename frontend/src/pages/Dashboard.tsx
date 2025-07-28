@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
 import { Dialog } from "@headlessui/react";
 
 interface Note {
@@ -16,9 +15,11 @@ const Dashboard = () => {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isNotesLoading, setIsNotesLoading] = useState(true);
+
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [editNoteId, setEditNoteId] = useState<string | null>(null); // null for add, id for edit
 
   const token = localStorage.getItem("token");
 
@@ -60,26 +61,46 @@ const Dashboard = () => {
     fetchNotes();
   }, [navigate, token]);
 
-  const handleAddNote = async () => {
+  const handleAddOrUpdateNote = async () => {
     if (!title.trim() || !description.trim()) return;
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/notes",
-        { title, description },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setNotes((prev) => [res.data.note, ...prev]);
+      if (editNoteId) {
+        // Update note
+        const res = await axios.put(
+          `http://localhost:5000/api/notes/${editNoteId}`,
+          { title, description },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setNotes((prev) =>
+          prev.map((note) => (note._id === editNoteId ? res.data.note : note))
+        );
+      } else {
+        // Create new note
+        const res = await axios.post(
+          "http://localhost:5000/api/notes",
+          { title, description },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setNotes((prev) => [res.data.note, ...prev]);
+      }
+
       setTitle("");
       setDescription("");
+      setEditNoteId(null);
       setShowModal(false);
     } catch (error) {
-      console.error("Add note error:", error);
+      console.error("Error saving note:", error);
     }
   };
 
@@ -92,6 +113,13 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Delete note error:", error);
     }
+  };
+
+  const handleEdit = (note: Note) => {
+    setEditNoteId(note._id);
+    setTitle(note.title);
+    setDescription(note.description);
+    setShowModal(true);
   };
 
   const handleSignOut = () => {
@@ -124,7 +152,12 @@ const Dashboard = () => {
       </div>
 
       <button
-        onClick={() => setShowModal(true)}
+        onClick={() => {
+          setEditNoteId(null);
+          setTitle("");
+          setDescription("");
+          setShowModal(true);
+        }}
         className="w-full mb-4 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
       >
         Create Note
@@ -133,7 +166,9 @@ const Dashboard = () => {
       <Dialog open={showModal} onClose={() => setShowModal(false)} className="fixed inset-0 z-10 overflow-y-auto">
         <div className="flex items-center justify-center min-h-screen px-4">
           <Dialog.Panel className="bg-white rounded-xl p-6 shadow-xl w-full max-w-md">
-            <Dialog.Title className="text-lg font-bold mb-2">New Note</Dialog.Title>
+            <Dialog.Title className="text-lg font-bold mb-2">
+              {editNoteId ? "Edit Note" : "New Note"}
+            </Dialog.Title>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -151,10 +186,10 @@ const Dashboard = () => {
                 Cancel
               </button>
               <button
-                onClick={handleAddNote}
+                onClick={handleAddOrUpdateNote}
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
-                Save
+                {editNoteId ? "Update" : "Save"}
               </button>
             </div>
           </Dialog.Panel>
@@ -165,18 +200,26 @@ const Dashboard = () => {
         <h3 className="font-medium text-gray-800 mb-2">Notes</h3>
         {isNotesLoading ? (
           <p className="text-sm text-gray-500">Loading notes...</p>
-        ) : notes.length === 0 ? (
+        ) : !notes || notes.length === 0 ? (
           <p className="text-sm text-gray-500">No notes yet.</p>
         ) : (
-          notes.map((note) => (
+          notes.map((note, index) => (
             <div
               key={note._id}
               className="bg-white border px-4 py-2 rounded-lg mb-2 shadow-sm"
             >
+              <div className="text-xs text-gray-400 mb-1">Note {index + 1}</div>
               <div className="font-semibold">{note.title}</div>
-              <div className="text-sm text-gray-600 mb-2">{note.description}</div>
+              <div className="text-sm text-gray-600 mb-2">
+                {note.description || "No description"}
+              </div>
               <div className="flex justify-end gap-2">
-                <button className="text-blue-500 hover:underline">Update</button>
+                <button
+                  onClick={() => handleEdit(note)}
+                  className="text-blue-500 hover:underline"
+                >
+                  Update
+                </button>
                 <button
                   onClick={() => handleDelete(note._id)}
                   className="text-red-500 hover:underline"

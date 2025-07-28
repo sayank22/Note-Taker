@@ -1,12 +1,13 @@
 import express from "express";
 import { createNote, getNotes, updateNote, deleteNote } from "../controllers/noteController";
-import { protect } from "../middlewares/authMiddleware";
+import { verifyToken } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.get("/", protect, getNotes);
-router.post("/", protect, createNote);
-router.put("/:id", protect, updateNote);
-router.delete("/:id", protect, deleteNote);
+router.get("/", verifyToken, getNotes);
+router.post("/", verifyToken, createNote);
+router.put("/:id", verifyToken, updateNote);
+router.delete("/:id", verifyToken, deleteNote);
+
 
 export default router;
