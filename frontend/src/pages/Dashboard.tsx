@@ -78,7 +78,7 @@ const Dashboard = () => {
           }
         );
         setNotes((prev) =>
-          prev.map((note) => (note._id === editNoteId ? res.data.note : note))
+          prev.map((note) => (note._id === editNoteId ? res.data : note))
         );
       } else {
         // Create new note
@@ -92,7 +92,7 @@ const Dashboard = () => {
             },
           }
         );
-        setNotes((prev) => [res.data.note, ...prev]);
+        setNotes((prev) => [res.data, ...prev]);
       }
 
       setTitle("");
