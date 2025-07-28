@@ -5,6 +5,17 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendOtpMail } from "../utils/sendOtp";
 
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.userId).select("-otp -__v");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching user", error: err });
+  }
+};
+
 // Send OTP
 export const sendOtp = async (req: Request, res: Response) => {
 const { email } = req.body;

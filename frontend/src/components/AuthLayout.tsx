@@ -1,13 +1,12 @@
-// src/components/AuthLayout.tsx
-import React from 'react';
+import React from "react";
+import image from "../assets/1.webp"; // ✅ adjust path if needed
 
 interface AuthLayoutProps {
   title: string;
-  imageSrc: string;
   children: React.ReactNode;
 }
 
-const AuthLayout: React.FC<AuthLayoutProps> = ({ title, imageSrc, children }) => {
+const AuthLayout: React.FC<AuthLayoutProps> = ({ title, children }) => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center bg-white">
       {/* Left Panel */}
@@ -19,7 +18,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ title, imageSrc, children }) =>
       {/* Right Panel */}
       <div className="hidden md:block md:w-1/2">
         <img
-          src={imageSrc}
+          src={image}
           alt={`${title} visual`}
           className="w-full h-screen object-cover"
         />
