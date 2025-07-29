@@ -1,11 +1,61 @@
 import { Response } from "express";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-
+import { OAuth2Client } from "google-auth-library";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import Otp from "../models/Otp";
 import User from "../models/User";
 import { sendOtpMail } from "../utils/sendOtp";
+
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @route   POST /api/auth/google-login
+// @desc    Login/Register user using Google OAuth token
+// @access  Public
+export const googleLogin = async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: "Google login failed" });
+    }
+
+    let user = await User.findOne({ email: payload.email });
+    if (!user) {
+      user = new User({
+        name: payload.name,
+        email: payload.email,
+        avatar: payload.picture,
+      });
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
+
+    res.status(200).json({
+      message: "Google login successful",
+      token: jwtToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 // @desc    Get authenticated user
 // @route   GET /api/auth/me
