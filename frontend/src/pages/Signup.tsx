@@ -76,23 +76,41 @@ const Signup: React.FC = () => {
           placeholder="Full Name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full border border-gray-300 px-4 py-2 rounded-md"
-        />
-        <input
-          type="date"
-          name="dob"
-          value={formData.dob}
-          onChange={handleChange}
-          className="w-full border border-gray-300 px-4 py-2 rounded-md"
-        />
+          className="w-full border-2 border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-0 focus:border-blue-600"
+/>
+        <div className="rounded-xl border px-4 py-2">
+  <label className="text-xs text-gray-500 block mb-1">Date of Birth</label>
+  <div className="flex items-center space-x-2">
+    <svg
+      className="w-5 h-5 text-gray-700"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+      />
+    </svg>
+    <input
+      type="date"
+      name="dob"
+      value={formData.dob}
+      onChange={handleChange}
+      className="w-full bg-transparent outline-none text-sm"
+    />
+  </div>
+</div>
         <input
           type="email"
           name="email"
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full border border-gray-300 px-4 py-2 rounded-md"
-        />
+           className="w-full border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-0 focus:border-blue-600"
+/>
         {step === 2 && (
           <input
             type="text"
