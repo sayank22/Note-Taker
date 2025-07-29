@@ -31,7 +31,7 @@ const Dashboard = () => {
 
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data.user);
@@ -45,7 +45,7 @@ const Dashboard = () => {
 
     const fetchNotes = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/notes", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/notes`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setNotes(res.data.notes || []);
@@ -68,7 +68,7 @@ const Dashboard = () => {
       if (editNoteId) {
         // Update note
         const res = await axios.put(
-          `http://localhost:5000/api/notes/${editNoteId}`,
+          `${import.meta.env.VITE_API_URL}/api/notes/${editNoteId}`,
           { title, description },
           {
             headers: {
@@ -83,7 +83,7 @@ const Dashboard = () => {
       } else {
         // Create new note
         const res = await axios.post(
-          "http://localhost:5000/api/notes",
+          `${import.meta.env.VITE_API_URL}/api/notes`,
           { title, description },
           {
             headers: {
@@ -106,7 +106,7 @@ const Dashboard = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/notes/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes((prev) => prev.filter((note) => note._id !== id));
