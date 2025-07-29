@@ -73,7 +73,7 @@ const Signup: React.FC = () => {
   const handleGoogleLogin = async (credentialResponse: any) => {
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google-login`, {
-        credential: credentialResponse.credential,
+      token: credentialResponse.credential,
       });
       const token = res.data.token;
       localStorage.setItem("token", token);
