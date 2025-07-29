@@ -142,14 +142,15 @@ const Dashboard = () => {
 
   return (
    <div className="max-w-md mx-auto p-4 relative">
-  <div className="md:absolute md:top-4 md:left-4 w-10 h-10 rounded-full bg-blue-400 mb-2 md:mb-0" />
-
-  <div className="flex justify-between items-center mb-4">
-    <h1 className="text-2xl font-semibold">Dashboard</h1>
-    <button onClick={handleSignOut} className="text-blue-500 hover:underline">
-      Sign Out
-    </button>
-  </div>
+  <div className="relative mb-4 flex items-center justify-center">
+  <h1 className="text-2xl font-semibold mx-auto">Dashboard</h1>
+  <button
+    onClick={handleSignOut}
+    className="absolute right-0 text-blue-500 hover:underline"
+  >
+    Sign Out
+  </button>
+</div>
       <div className="bg-white rounded-xl shadow p-4 mb-4">
         <h2 className="text-lg font-bold mb-1">Welcome, {user.name}!</h2>
         <p className="text-sm text-gray-600">Email: {obfuscateEmail(user.email)}</p>

@@ -3,6 +3,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyOtp from "./components/VerifyOtp";
 import Dashboard from "./pages/Dashboard";
+import Logo from "./components/Logo";
 
 // ✅ Protected route wrapper
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -12,6 +13,8 @@ return token ? children : <Navigate to="/login" replace />;
 
 const App = () => {
 return (
+  <>
+<Logo />
 <Routes>
 <Route path="/" element={<Navigate to="/signup" replace />} />
 <Route path="/signup" element={<Signup />} />
@@ -27,6 +30,7 @@ element={
 />
 <Route path="*" element={<div>404 Not Found</div>} />
 </Routes>
+</>
 );
 };
 
