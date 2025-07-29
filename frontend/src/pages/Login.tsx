@@ -4,7 +4,7 @@ import { sendOtp, verifyOtp } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
-import axios from "axios"; // Added missing import
+import axios from "axios"; 
 
 const Login: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -47,9 +47,7 @@ const Login: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-      // For login, we don't need name and dob, so pass empty strings or null
-      // You might want to create a separate loginWithOtp function in your API
-      const res = await verifyOtp(email, otp, "", ""); // Pass empty strings for name and dob
+      const res = await verifyOtp(email, otp, "", ""); 
       const token = res.data.token;
       localStorage.setItem("token", token);
       toast.success("Login successful!");
@@ -80,7 +78,7 @@ const Login: React.FC = () => {
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <AuthLayout title="Login" imageSrc="/assets/1.webp">
+      <AuthLayout title="Sign In" imageSrc="/assets/1.webp">
         <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
           <input
             type="email"
