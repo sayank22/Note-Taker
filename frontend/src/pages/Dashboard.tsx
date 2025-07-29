@@ -105,7 +105,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error saving note:", error);
     }
-    toast.error("Failed to save note.");
   };
 
   const handleDelete = async (id: string) => {
