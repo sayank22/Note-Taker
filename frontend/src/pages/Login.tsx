@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
 import { sendOtp, verifyOtp } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 const Login: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -16,6 +17,7 @@ const Login: React.FC = () => {
   const handleGetOtp = async () => {
     if (!email) {
       setError("Please enter your email.");
+      toast.info("Please enter your email.");
       return;
     }
     setLoading(true);
@@ -24,9 +26,11 @@ const Login: React.FC = () => {
     try {
       await sendOtp(email);
       setSuccess("OTP sent to your email.");
+      toast.success("OTP sent to your email.");
       setStep(2);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to send OTP. Try again.");
+      toast.error("Failed to send OTP. Try again.");
     } finally {
       setLoading(false);
     }
@@ -35,6 +39,7 @@ const Login: React.FC = () => {
   const handleLogin = async () => {
     if (!otp) {
       setError("Please enter the OTP.");
+      toast.info("Please enter the OTP.");
       return;
     }
     setLoading(true);
@@ -43,9 +48,11 @@ const Login: React.FC = () => {
       const res = await verifyOtp(email, otp);
       const token = res.data.token;
       localStorage.setItem("token", token);
+      toast.success("Login successful!");
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid OTP.");
+      toast.error("Invalid OTP");
     } finally {
       setLoading(false);
     }

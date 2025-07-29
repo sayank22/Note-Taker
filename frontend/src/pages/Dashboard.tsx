@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Dialog } from "@headlessui/react";
+import { toast } from "react-toastify";
 
 interface Note {
   _id: string;
@@ -80,6 +81,7 @@ const Dashboard = () => {
         setNotes((prev) =>
           prev.map((note) => (note._id === editNoteId ? res.data : note))
         );
+        toast.success("Note updated successfully!");
       } else {
         // Create new note
         const res = await axios.post(
@@ -93,6 +95,7 @@ const Dashboard = () => {
           }
         );
         setNotes((prev) => [res.data, ...prev]);
+        toast.success("Note added successfully!");
       }
 
       setTitle("");
@@ -102,6 +105,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error saving note:", error);
     }
+    toast.error("Failed to save note.");
   };
 
   const handleDelete = async (id: string) => {
@@ -110,8 +114,10 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNotes((prev) => prev.filter((note) => note._id !== id));
+      toast.success("Note deleted.");
     } catch (error) {
       console.error("Delete note error:", error);
+      toast.error("Failed to delete note.");
     }
   };
 
@@ -136,16 +142,15 @@ const Dashboard = () => {
   if (!user) return <div className="text-center mt-10">Failed to load user.</div>;
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <div className="w-10 h-10 rounded-full bg-blue-400 absolute top-4 left-4" />
+   <div className="max-w-md mx-auto p-4 relative">
+  <div className="md:absolute md:top-4 md:left-4 w-10 h-10 rounded-full bg-blue-400 mb-2 md:mb-0" />
 
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <button onClick={handleSignOut} className="text-blue-500 hover:underline">
-          Sign Out
-        </button>
-      </div>
-
+  <div className="flex justify-between items-center mb-4">
+    <h1 className="text-2xl font-semibold">Dashboard</h1>
+    <button onClick={handleSignOut} className="text-blue-500 hover:underline">
+      Sign Out
+    </button>
+  </div>
       <div className="bg-white rounded-xl shadow p-4 mb-4">
         <h2 className="text-lg font-bold mb-1">Welcome, {user.name}!</h2>
         <p className="text-sm text-gray-600">Email: {obfuscateEmail(user.email)}</p>

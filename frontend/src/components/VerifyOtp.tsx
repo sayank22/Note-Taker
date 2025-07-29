@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp } from "../api/auth";
+import { toast } from 'react-toastify';
 
 export default function VerifyOtp() {
   const location = useLocation();
@@ -22,6 +23,7 @@ export default function VerifyOtp() {
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid OTP.");
+      toast.error("Invalid OTP");
     } finally {
       setLoading(false);
     }

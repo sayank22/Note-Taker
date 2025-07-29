@@ -4,6 +4,7 @@ import { sendOtp, verifyOtp } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const Signup: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -25,6 +26,7 @@ const Signup: React.FC = () => {
   const handleGetOtp = async () => {
     if (!formData.name || !formData.dob || !formData.email) {
       setError("Please fill in all fields.");
+      toast.info("Please fill in all fields.");
       return;
     }
     setLoading(true);
@@ -34,6 +36,7 @@ const Signup: React.FC = () => {
       setStep(2);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to send OTP.");
+      toast.error("Failed to send OTP.");
     } finally {
       setLoading(false);
     }
@@ -42,6 +45,7 @@ const Signup: React.FC = () => {
   const handleSignup = async () => {
     if (!formData.otp) {
       setError("Please enter the OTP.");
+      toast.info("Please enter the OTP.");
       return;
     }
     setLoading(true);
@@ -55,9 +59,12 @@ const Signup: React.FC = () => {
       );
       const token = res.data.token;
       localStorage.setItem("token", token);
+      toast.success("Login successful!");
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Invalid OTP.");
+      toast.error("Invalid OTP");
+
     } finally {
       setLoading(false);
     }
@@ -74,6 +81,8 @@ const Signup: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       setError(err.response?.data?.message || "Google login failed");
+      toast.error("Google login failed");
+
     }
   };
 
